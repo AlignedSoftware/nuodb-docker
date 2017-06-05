@@ -1,6 +1,5 @@
 **DESCRIPTION:**
 
-http://bamboo.bo2.nuodb.com/bamboo/artifact/RELEASE-PACKAGE35/shared/build-8/Linux-.tar.gz/nuodb-2.6.1.8.linux.x86_64.tar.gz
 
 **DOCKER BUILD:**
 
