@@ -21,7 +21,6 @@ RUN subscription-manager register --username=$RHUSER --password=$RHPASS \
     && subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-ose-3.0-rpms"
 
 RUN yum install net-tools java unzip -y && subscription-manager unregister
-#RUN curl -SL http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jre-8u131-linux-x64.rpm -o /tmp/jre-8u131-linux-x64.rpm
 
 RUN tar xvf /tmp/oc-3.5.5.8-linux.tar.gz -C /bin && rm /tmp/oc-3.5.5.8-linux.tar.gz \
     && curl -SL https://s3.amazonaws.com/aws-cli/awscli-bundle.zip -o /tmp/awscli-bundle.zip \
@@ -32,6 +31,9 @@ RUN curl -SL http://bamboo.bo2.nuodb.com/bamboo/artifact/RELEASE-PACKAGE$RELEASE
     && mkdir -p /opt/nuodb \
     && tar xvf /tmp/nuodb.tgz -C /opt/nuodb --strip-components 1 \
     && rm -rf /tmp/nuodb.tgz
+
+#set ownership of nuodb home
+RUN chown -R root:root /opt/nuodb
 
 ADD scripts /scripts
 COPY help.1 /

@@ -2,7 +2,7 @@
 AGENT_PORT="48011"
 NODE_PORT="48010"
 BROKER_PORT="48004"
-CONTAINER="docker.io/nuodbopenshift/nuodb-ce-dev:latest"
+CONTAINER="docker.io/nuodb/nuodb-ce-2.6.1:latest"
 
 #login into oc
 oc login ${OC_ADDRESS}:8443 -u ${USERNAME} -p ${PASSWORD} --insecure-skip-tls-verify=true

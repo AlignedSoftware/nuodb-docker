@@ -2,6 +2,7 @@
 #
 #  start the NuoDB processes
 #
+set -x
 
 # setup NUODB vars pointing to standard locations
 export NUODB_HOME=/opt/nuodb
@@ -63,5 +64,10 @@ fi
 NUODBMGR="$NUODB_HOME/bin/nuodbmgr --broker ${PEER_ADDRESS}:$AGENT_PORT --password $DOMAIN_PASSWORD --command"
 START_CMD="$START_CMD options '$NODE_OPTS'"
 $NUODBMGR "$START_CMD"
+
+#start api service
+mv /opt/nuodb/etc/default.properties.sample /opt/nuodb/etc/default.properties
+sed -i "/#domainPassword =/c\domainPassword = $DOMAIN_PASSWORD" /opt/nuodb/etc/default.properties
+/opt/nuodb/etc/nuorestsvc start
 
 tail -f $NUODB_LOGDIR/agent.log
