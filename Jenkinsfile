@@ -1,7 +1,7 @@
 //def tag_prefix=env.BRANCH_NAME.replaceAll(/[^a-zA-Z0-9_]/,"_")
 // This should really come from branch name
 
-def tag_prefix="dms-"
+def tag_prefix=""
 
 def awsPushCredentials="build-jenkins-oa"
 def nuodbRepo=env.REPOSITORY
