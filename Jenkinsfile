@@ -9,8 +9,8 @@ def region="us-east-1"
 
 def dockerhubPushCredentials="docker.io-nuodb-push"
 
-def redhatPushCredentials="redhat.subscription"
-def redhatRepo="https://registry.connect.redhat.com"
+def redhatPushCredentials="redhat.nuodb.push"
+def redhatRepo="https://registry.rhc4tp.openshift.com"
 
 def release_build=env.RELEASE_BUILD
 def release_package=env.RELEASE_PACKAGE
@@ -102,6 +102,7 @@ node('docker') {
     withCredentials([usernamePassword(credentialsId: 'redhat.subscription', passwordVariable: 'RHPASS', usernameVariable: 'RHUSER')]) {
 	performBuild("nuodb", BUILDARGS)
 	performBuild("nuodb-ce", BUILDARGS, "nuodb/nuodb-ce")
+	performBuild("nuodb-ce", BUILDARGS, "${env.REDHAT_KEY}/nuodb-ce")
     }
 
     //////////////////////////////////////////////////////////////////////
@@ -121,5 +122,5 @@ node('docker') {
     //////////////////////////////////////////////////////////////////////
 
     standardPush("docker hub", "nuodb/nuodb-ce", tag_prefix, "", dockerhubPushCredentials, tagSet)
-    standardPush("RedHat", "nuodb/nuodb-ce", tag_prefix, redhatRepo, redhatPushCredentials, tagSet)
+    standardPush("RedHat", "${env.REDHAT_KEY}/nuodb-ce", tag_prefix, redhatRepo, redhatPushCredentials, tagSet)
 }
