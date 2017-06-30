@@ -15,7 +15,7 @@ LABEL "name"="$VERSION" \
 RUN subscription-manager register --username=$RHUSER --password=$RHPASS \
     && subscription-manager attach --pool=8a85f9815b58a400015b58e392315383 \
     && subscription-manager repos --disable="*" \
-    && subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-ose-3.0-rpms"
+    && subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-ose-3.5-rpms"
 
 RUN yum -y install --disablerepo "*" --enablerepo rhel-7-server-rpms,rhel-7-server-ose-3.5-rpms \
       --setopt=tsflags=nodocs net-tools java unzip atomic-openshift-clients \
