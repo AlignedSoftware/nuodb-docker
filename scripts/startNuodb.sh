@@ -34,7 +34,7 @@ if [ "${NODE_TYPE}" != "BROKER" ]; then
     while [ "$status" == "" ]; do
         echo "wait 5 seconds for broker"
         sleep 5
-        status="$( /opt/nuodb/bin/nuodbmgr --broker localhost --password bird --command 'show domain summary' | grep sm )"
+        status="$( /opt/nuodb/bin/nuodbmgr --broker $PEER_ADDRESS --password $DOMAIN_PASSWORD --command 'show domain summary' | grep BROKER )"
         ((count++))
         echo "loop count: " $count
         if [ "$count" == 10 ]; then
