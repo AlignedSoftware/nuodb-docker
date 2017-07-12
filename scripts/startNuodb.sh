@@ -27,6 +27,23 @@ BROKER_OPTS="--password ${DOMAIN_PASSWORD} --broker true"
 [ -n "$PEER_ADDRESS" ] && BROKER_OPTS="$BROKER_OPTS --peer ${PEER_ADDRESS}"
 [ -n "$ALT_ADDRESS" ] && BROKER_OPTS="$BROKER_OPTS --advertise-alt --alt-addr ${ALT_ADDRESS}"
 
+#confirm broker is responding
+if [ "${NODE_TYPE}" != "BROKER" ]; then
+    status=""
+    count=1
+    while [ "$status" == "" ]; do
+        echo "wait 5 seconds for broker"
+        sleep 5
+        status="$( /opt/nuodb/bin/nuodbmgr --broker localhost --password bird --command 'show domain summary' | grep sm )"
+        ((count++))
+        echo "loop count: " $count
+        if [ "$count" == 10 ]; then
+            echo "timed out waiting for broker to respond. Exiting"
+            exit 1
+        fi
+    done
+fi
+
 # first start the broker
 if [ "${NODE_TYPE}" == "SM" ]; then
    HOST_TAGS="-DhostTags=SM_OK=True"
@@ -35,9 +52,6 @@ elif [ "${NODE_TYPE}" == "TE" ]; then
 fi
 
 $JAVA_HOME/bin/java $HOST_TAGS -jar $NUODB_HOME/jar/nuoagent.jar --port ${AGENT_PORT} $BROKER_OPTS >> $NUODB_LOGDIR/agent.log 2>&1 &
-
-# wait a bit for the broker
-sleep 5
 
 # set up engine start-up vars
 START_CMD="start process ${NODE_TYPE} host ${PEER_ADDRESS}:${AGENT_PORT} database ${DB_NAME}"
@@ -68,9 +82,6 @@ fi
 #disable thp if enabled
 /bin/bash /scripts/disable_thp.sh
 
-#NUODBMGR="$NUODB_HOME/bin/nuodbmgr --broker ${PEER_ADDRESS}:${AGENT_PORT} --password ${DOMAIN_PASSWORD} --command"
-#START_CMD="$START_CMD options '$NODE_OPTS'"
-#$NUODBMGR "$START_CMD"
 
 #start api service
 /opt/nuodb/etc/nuorestsvc start
