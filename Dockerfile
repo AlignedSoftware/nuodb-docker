@@ -19,7 +19,7 @@ RUN curl -SL http://bamboo.bo2.nuodb.com/bamboo/artifact/RELEASE-PACKAGE$RELEASE
     && git clone https://github.com/thebithead/nuoca.git /opt/nuoca
 
 #set ownership of nuodb home
-RUN chown -R nobody:nobody /opt/nuodb
+RUN chown -R root:root /opt/nuodb
 
 #remove extra directories
 RUN rm -rf /opt/nuodb/samples && rm -rf /opt/nuodb/doc && rm -rf /opt/nuodb/tools
@@ -27,6 +27,6 @@ RUN rm -rf /opt/nuodb/samples && rm -rf /opt/nuodb/doc && rm -rf /opt/nuodb/tool
 ADD scripts /scripts
 COPY help.1 /
 
-USER 99
+#USER 99
 
 ENTRYPOINT ["/scripts/entrypoint.sh"]
