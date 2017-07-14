@@ -42,6 +42,15 @@ if [ "${NODE_TYPE}" != "BROKER" ]; then
             exit 1
         fi
     done
+
+    #clean unreachable nodes from domain state
+    uuid="$(/opt/nuodb/bin/nuodbmgr --broker $PEER_ADDRESS --password $DOMAIN_PASSWORD \
+        --command "show domain summary" | grep UNREACHABLE | sed 's/\(.*\)\(uuid.*\)\( .*\)/\2/g' | awk '{print $1}')"
+
+    for id in $uuid; do
+        echo $id
+        /opt/nuodb/bin/nuodbmgr --broker $PEER_ADDRESS --password $DOMAIN_PASSWORD --command "agent deprovision stableId $id"
+    done
 fi
 
 # first start the broker

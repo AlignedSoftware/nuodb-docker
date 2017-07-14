@@ -26,6 +26,8 @@ RUN rm -rf /opt/nuodb/samples && rm -rf /opt/nuodb/doc && rm -rf /opt/nuodb/tool
 
 ADD scripts /scripts
 COPY help.1 /
+COPY scripts/removeHost.sh /usr/lib/systemd/system-shutdown/
+RUN chmod +x /usr/lib/systemd/system-shutdown/removeHost.sh
 
 #USER 99
 
