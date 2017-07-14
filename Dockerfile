@@ -10,7 +10,7 @@ LABEL "name"="$VERSION" \
       "version"="$RELEASE_BUILD" \
       "release"="$BUILD"
 
-RUN yum install  --setopt=tsflags=nodocs java network-manager git -y
+RUN yum install  --setopt=tsflags=nodocs java net-tools git -y
 
 RUN curl -SL http://bamboo.bo2.nuodb.com/bamboo/artifact/RELEASE-PACKAGE$RELEASE_PACKAGE/shared/build-$BUILD/Linux-.tar.gz/$VERSION-$RELEASE_BUILD.$BUILD.linux.x86_64.tar.gz -o /tmp/nuodb.tgz \
     && mkdir -p /opt/nuodb \
