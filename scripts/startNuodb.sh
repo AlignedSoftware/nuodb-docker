@@ -49,7 +49,11 @@ if [ "${NODE_TYPE}" != "BROKER" ]; then
 
     for id in $uuid; do
         echo $id
+        #remove broker
         /opt/nuodb/bin/nuodbmgr --broker $PEER_ADDRESS --password $DOMAIN_PASSWORD --command "agent deprovision stableId $id"
+        #remove host
+        /opt/nuodb/bin/nuodbmgr --broker $PEER_ADDRESS --password $DOMAIN_PASSWORD \
+             --command "domainstate removehostprocesses id $id database ${DB_NAME}"
     done
 fi
 
