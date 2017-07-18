@@ -100,4 +100,4 @@ fi
 /opt/nuodb/etc/nuorestsvc start
 
 cat $NUODB_LOGDIR/agent.log
-tail -f $NUODB_LOGDIR/agent.log
+tail -f $NUODB_LOGDIR/agent.log &

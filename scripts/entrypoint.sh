@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x
-
 #handle environment types
 if [ "${ENV_TYPE}" == "OPENSHIFT" ]; then
     /bin/bash /scripts/openshift.sh
@@ -20,4 +18,12 @@ fi
 
 #run startNuodb.sh for starting nuodb broker, sm, and te containers
 /bin/bash /scripts/startNuodb.sh
+
+
+#trap SIGTERM event and remove host
+trap '/opt/nuodb/bin/nuodbmgr --broker ${PEER_ADDRESS} --password ${DOMAIN_PASSWORD} --command \"remove host address $IPADDRESS database ${DB_NAME}\"' SIGTERM
+
+while true; do :; done
+
+
 
