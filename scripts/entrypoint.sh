@@ -23,7 +23,7 @@ fi
 #trap SIGTERM event and remove host
 trap '/opt/nuodb/bin/nuodbmgr --broker ${PEER_ADDRESS} --password ${DOMAIN_PASSWORD} --command \"remove host address $IPADDRESS database ${DB_NAME}\"' SIGTERM
 
-while true; do :; done
+while true; do sleep 3; done
 
 
 
