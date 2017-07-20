@@ -15,12 +15,10 @@ LABEL "name"="$VERSION" \
 
 ADD install /tmp
 
-RUN subscription-manager register --username=$RHUSER --password=$RHPASS \
-    && subscription-manager attach --pool=8a85f9815b58a400015b58e392315383 \
-    && subscription-manager repos --disable="*" \
+RUN subscription-manager repos --disable="*" \
     && subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-ose-3.0-rpms"
 
-RUN yum install net-tools java unzip -y && subscription-manager unregister
+RUN yum install net-tools java unzip -y
 
 RUN tar xvf /tmp/oc-3.5.5.8-linux.tar.gz -C /bin && rm /tmp/oc-3.5.5.8-linux.tar.gz \
     && curl -SL https://s3.amazonaws.com/aws-cli/awscli-bundle.zip -o /tmp/awscli-bundle.zip \
