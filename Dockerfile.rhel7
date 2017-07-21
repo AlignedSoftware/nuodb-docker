@@ -22,13 +22,15 @@ RUN yum -y install --disablerepo "*" --enablerepo rhel-7-server-rpms,rhel-7-serv
     && yum autoremove git -y \
     && yum clean all
 
-#set ownership of nuodb home
-#RUN chown -R nobody:nobody /opt/nuodb
-
 ADD scripts /scripts
 COPY help.1 /
 COPY LICENSE /licenses/
 
-#USER 99
+RUN useradd -l -u 1000 -r -g 0 -d /opt/nuodb -s /sbin/nologin -c "nuodb user" nuodb \
+#set ownership of nuodb home
+    && chown -R nuodb:0 /opt/{nuodb,nuoca} /scripts \
+    && chmod -R g=u /opt/{nuodb,nuoca} /scripts
+
+USER 1000
 
 ENTRYPOINT ["/scripts/entrypoint.sh"]

@@ -12,8 +12,19 @@
  `VERSION=nuodb or nuodb-ce` - Community Edition or Full version of NuoDB
 
 example:
+```shell
+# build on centos7
+$ make
+
+# OR
+
+# build on rhel7
+$ make TARGET=rhel7
+```
+
+further customizing the build w/ docker:
 ```bash
-Docker build \
+docker build \
     -t nuodb-2.6.1:latest \
     --build-arg RELEASE_PACKAGE=35 \
     --build-arg BUILD=8 \

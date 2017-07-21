@@ -24,6 +24,7 @@ test:
 	$(eval CONTAINERID=$(shell docker run -tdi ${CONTEXT}/${IMAGE_NAME}:${TARGET}-${VERSION}))
 	@sleep 5
 	@docker exec ${CONTAINERID} ps aux
+	@docker logs ${CONTAINERID}
 	@docker rm -f ${CONTAINERID}
 
 #run:
