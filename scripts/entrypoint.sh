@@ -19,6 +19,10 @@ fi
 #run startNuodb.sh for starting nuodb broker, sm, and te containers
 /bin/bash /scripts/startNuodb.sh
 
+#enable nuoca logging
+if [ "${LOGGING}" = "true" ]; then
+    /bin/bash /scripts/startNuoCa.sh
+fi
 
 #trap SIGTERM event and remove host
 trap '/opt/nuodb/bin/nuodbmgr --broker ${PEER_ADDRESS} --password ${DOMAIN_PASSWORD} --command \"remove host address $IPADDRESS database ${DB_NAME}\"' SIGTERM
