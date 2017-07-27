@@ -19,12 +19,15 @@ RUN yum -y install --setopt=tsflags=nodocs java net-tools git epel-release pytho
     && rm -rf /opt/nuodb/{samples,doc} \
     && rm -rf /tmp/nuodb.tgz \
     && git clone https://github.com/thebithead/nuoca.git /opt/nuoca \
+    && git clone https://github.com/nuodb/nuodb-monitoring.git /opt/nuomonitor \
     && yum autoremove git -y \
     && yum clean all
 
-#RUN /usr/bin/pip install -r /scripts/requirements.txt
+RUN /usr/bin/pip install -r /opt/nuoca/requirements.txt
+RUN cd /opt/nuomonitor && python /opt/nuomonitor/setup.py install
 
 ADD scripts /scripts
+ADD dbSchema /dbSchema
 COPY help.1 /
 COPY LICENSE /licenses/
 

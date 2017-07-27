@@ -20,7 +20,7 @@ fi
 /bin/bash /scripts/startNuodb.sh
 
 #enable nuoca logging
-if [ "${LOGGING}" = "true" ]; then
+if [ "${ARG_apphost}" ]; then
     /bin/bash /scripts/startNuoCa.sh
 fi
 

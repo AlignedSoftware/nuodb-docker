@@ -1,0 +1,369 @@
+<?xml version="1.0"?>
+<backup version="2.6.1-8" format="csv">
+  <database>
+    <driver-info>
+      <name>NuoDB JDBC Driver</name>
+      <version>2.6</version>
+      <major-version>2</major-version>
+      <minor-version>6</minor-version>
+    </driver-info>
+    <database-info>
+      <product-name>NuoDB</product-name>
+      <product-version>2.6.1-8</product-version>
+      <major-version>2</major-version>
+      <minor-version>6</minor-version>
+      <platform-version>786432</platform-version>
+    </database-info>
+    <connection-spec type="driver" schema="STOREFRONT">
+      <driver>com.nuodb.jdbc.Driver</driver>
+      <url>jdbc:com.nuodb://localhost/Storefront</url>
+      <username>StorefrontUser</username>
+    </connection-spec>
+    <catalog>
+      <schema name="STOREFRONT">
+        <sequence name="CUSTOMER$IDENTITY_SEQUENCE"/>
+        <sequence name="PRODUCT$IDENTITY_SEQUENCE"/>
+        <sequence name="PRODUCT_REVIEW$IDENTITY_SEQUENCE"/>
+        <sequence name="PURCHASE$IDENTITY_SEQUENCE"/>
+        <table name="APP_INSTANCE" type="TABLE">
+          <column name="UUID">
+            <type code="12" name="varchar" size="36" precision="36" scale="0"/>
+          </column>
+          <column name="CPU_UTILIZATION">
+            <type code="4" name="integer" size="4" precision="9" scale="0"/>
+          </column>
+          <column name="CURRENCY">
+            <type code="12" name="varchar" size="255" precision="255" scale="0"/>
+          </column>
+          <column name="DATE_STARTED">
+            <type code="-5" name="bigint" size="8" precision="19" scale="0"/>
+          </column>
+          <column name="FIRST_HEARTBEAT">
+            <type code="93" name="timestamp" size="12" precision="16" scale="6"/>
+          </column>
+          <column name="LAST_API_ACTIVITY">
+            <type code="93" name="timestamp" size="12" precision="16" scale="6"/>
+          </column>
+          <column name="LAST_HEARTBEAT">
+            <type code="93" name="timestamp" size="12" precision="16" scale="6"/>
+          </column>
+          <column name="NODE_ID">
+            <type code="4" name="integer" size="4" precision="9" scale="0"/>
+          </column>
+          <column name="REGION">
+            <type code="12" name="varchar" size="255" precision="255" scale="0"/>
+          </column>
+          <column name="STOP_USERS_WHEN_IDLE">
+            <type code="16" name="boolean" size="2" precision="9" scale="0"/>
+          </column>
+          <column name="URL">
+            <type code="12" name="varchar" size="255" precision="255" scale="0"/>
+          </column>
+          <primary-key name="APP_INSTANCE..PRIMARY_KEY">
+            <column name="UUID"/>
+          </primary-key>
+          <index name="IDX_APP_INSTANCE_LAST_HEARTBEAT" unique="false">
+            <column name="LAST_HEARTBEAT"/>
+          </index>
+        </table>
+        <table name="CART_SELECTION" type="TABLE">
+          <column name="DATE_ADDED">
+            <type code="93" name="timestamp" size="12" precision="16" scale="6"/>
+          </column>
+          <column name="DATE_MODIFIED">
+            <type code="93" name="timestamp" size="12" precision="16" scale="6"/>
+          </column>
+          <column name="QUANTITY">
+            <type code="4" name="integer" size="4" precision="9" scale="0"/>
+          </column>
+          <column name="REGION">
+            <type code="12" name="varchar" size="255" precision="255" scale="0"/>
+          </column>
+          <column name="UNIT_PRICE">
+            <type code="4" name="integer" size="4" precision="8" scale="2"/>
+          </column>
+          <column name="CUSTOMER_ID">
+            <type code="-5" name="bigint" size="8" precision="19" scale="0"/>
+          </column>
+          <column name="PRODUCT_ID">
+            <type code="-5" name="bigint" size="8" precision="19" scale="0"/>
+          </column>
+          <primary-key name="CART_SELECTION..PRIMARY_KEY">
+            <column name="CUSTOMER_ID"/>
+            <column name="PRODUCT_ID"/>
+          </primary-key>
+          <index name="IDX_CART_SELECTION_DATE_MODIFIED" unique="false">
+            <column name="DATE_MODIFIED"/>
+          </index>
+          <foreign-key primary-schema="STOREFRONT" primary-table="CUSTOMER" foreign-schema="STOREFRONT" foreign-table="CART_SELECTION" update-action="cascade" delete-action="no_action">
+            <reference primary-column="ID" foreign-column="CUSTOMER_ID"/>
+          </foreign-key>
+          <foreign-key primary-schema="STOREFRONT" primary-table="PRODUCT" foreign-schema="STOREFRONT" foreign-table="CART_SELECTION" update-action="cascade" delete-action="no_action">
+            <reference primary-column="ID" foreign-column="PRODUCT_ID"/>
+          </foreign-key>
+        </table>
+        <table name="CUSTOMER" type="TABLE">
+          <column name="ID" auto-increment="true">
+            <type code="-5" name="bigint" size="8" precision="19" scale="0"/>
+            <sequence ref-index="0"/>
+          </column>
+          <column name="DATE_ADDED">
+            <type code="93" name="timestamp" size="12" precision="16" scale="6"/>
+          </column>
+          <column name="DATE_LAST_ACTIVE">
+            <type code="93" name="timestamp" size="12" precision="16" scale="6"/>
+          </column>
+          <column name="EMAIL_ADDRESS" nullable="true">
+            <type code="12" name="varchar" size="255" precision="255" scale="0"/>
+          </column>
+          <column name="REGION">
+            <type code="12" name="varchar" size="255" precision="255" scale="0"/>
+          </column>
+          <column name="WORKLOAD" nullable="true">
+            <type code="12" name="varchar" size="255" precision="255" scale="0"/>
+          </column>
+          <primary-key name="CUSTOMER..PRIMARY_KEY">
+            <column name="ID"/>
+          </primary-key>
+          <index name="IDX_CUSTOMER_DATE_LAST_ACTIVE" unique="false">
+            <column name="DATE_LAST_ACTIVE"/>
+          </index>
+        </table>
+        <table name="PRODUCT" type="TABLE">
+          <column name="ID" auto-increment="true">
+            <type code="-5" name="bigint" size="8" precision="19" scale="0"/>
+            <sequence ref-index="1"/>
+          </column>
+          <column name="DATE_ADDED">
+            <type code="93" name="timestamp" size="12" precision="16" scale="6"/>
+          </column>
+          <column name="DATE_MODIFIED">
+            <type code="93" name="timestamp" size="12" precision="16" scale="6"/>
+          </column>
+          <column name="DESCRIPTION">
+            <type code="12" name="varchar" size="1000" precision="1000" scale="0"/>
+          </column>
+          <column name="IMAGE_URL" nullable="true">
+            <type code="12" name="varchar" size="255" precision="255" scale="0"/>
+          </column>
+          <column name="NAME">
+            <type code="12" name="varchar" size="255" precision="255" scale="0"/>
+          </column>
+          <column name="PURCHASE_COUNT">
+            <type code="-5" name="bigint" size="8" precision="19" scale="0"/>
+          </column>
+          <column name="RATING" nullable="true">
+            <type code="6" name="float" size="4" precision="15" scale="0"/>
+          </column>
+          <column name="REVIEW_COUNT">
+            <type code="4" name="integer" size="4" precision="9" scale="0"/>
+          </column>
+          <column name="UNIT_PRICE">
+            <type code="4" name="integer" size="4" precision="8" scale="2"/>
+          </column>
+          <primary-key name="PRODUCT..PRIMARY_KEY">
+            <column name="ID"/>
+          </primary-key>
+        </table>
+        <table name="PRODUCT_CATEGORY" type="TABLE">
+          <column name="PRODUCT_ID">
+            <type code="-5" name="bigint" size="8" precision="19" scale="0"/>
+          </column>
+          <column name="CATEGORY">
+            <type code="12" name="varchar" size="255" precision="255" scale="0"/>
+          </column>
+          <primary-key name="PRODUCT_CATEGORY..PRIMARY_KEY">
+            <column name="PRODUCT_ID"/>
+            <column name="CATEGORY"/>
+          </primary-key>
+          <index name="UK_CU9I33D6DBYO4S8JMFEPOYN59" unique="false">
+            <column name="PRODUCT_ID"/>
+          </index>
+          <index name="UK_AN7O8WBRP83D9GH17EARBGBYN" unique="false">
+            <column name="CATEGORY"/>
+          </index>
+          <foreign-key primary-schema="STOREFRONT" primary-table="PRODUCT" foreign-schema="STOREFRONT" foreign-table="PRODUCT_CATEGORY" update-action="cascade" delete-action="no_action">
+            <reference primary-column="ID" foreign-column="PRODUCT_ID"/>
+          </foreign-key>
+        </table>
+        <table name="PRODUCT_REVIEW" type="TABLE">
+          <column name="ID" auto-increment="true">
+            <type code="-5" name="bigint" size="8" precision="19" scale="0"/>
+            <sequence ref-index="2"/>
+          </column>
+          <column name="COMMENTS" nullable="true">
+            <type code="12" name="varchar" size="255" precision="255" scale="0"/>
+          </column>
+          <column name="DATE_ADDED">
+            <type code="93" name="timestamp" size="12" precision="16" scale="6"/>
+          </column>
+          <column name="RATING">
+            <type code="4" name="integer" size="4" precision="9" scale="0"/>
+          </column>
+          <column name="REGION">
+            <type code="12" name="varchar" size="255" precision="255" scale="0"/>
+          </column>
+          <column name="TITLE">
+            <type code="12" name="varchar" size="255" precision="255" scale="0"/>
+          </column>
+          <column name="CUSTOMER_ID">
+            <type code="-5" name="bigint" size="8" precision="19" scale="0"/>
+          </column>
+          <column name="PRODUCT_ID">
+            <type code="-5" name="bigint" size="8" precision="19" scale="0"/>
+          </column>
+          <primary-key name="PRODUCT_REVIEW..PRIMARY_KEY">
+            <column name="ID"/>
+          </primary-key>
+          <index name="IDX_PRODUCT_REVIEW_PRODUCT" unique="false">
+            <column name="PRODUCT_ID"/>
+          </index>
+          <index name="IDX_PRODUCT_REVIEW_DATE_ADDED" unique="false">
+            <column name="DATE_ADDED"/>
+          </index>
+          <foreign-key primary-schema="STOREFRONT" primary-table="CUSTOMER" foreign-schema="STOREFRONT" foreign-table="PRODUCT_REVIEW" update-action="cascade" delete-action="no_action">
+            <reference primary-column="ID" foreign-column="CUSTOMER_ID"/>
+          </foreign-key>
+          <foreign-key primary-schema="STOREFRONT" primary-table="PRODUCT" foreign-schema="STOREFRONT" foreign-table="PRODUCT_REVIEW" update-action="cascade" delete-action="no_action">
+            <reference primary-column="ID" foreign-column="PRODUCT_ID"/>
+          </foreign-key>
+        </table>
+        <table name="PURCHASE" type="TABLE">
+          <column name="ID" auto-increment="true">
+            <type code="-5" name="bigint" size="8" precision="19" scale="0"/>
+            <sequence ref-index="3"/>
+          </column>
+          <column name="DATE_PURCHASED">
+            <type code="93" name="timestamp" size="12" precision="16" scale="6"/>
+          </column>
+          <column name="REGION">
+            <type code="12" name="varchar" size="255" precision="255" scale="0"/>
+          </column>
+          <column name="CUSTOMER_ID">
+            <type code="-5" name="bigint" size="8" precision="19" scale="0"/>
+          </column>
+          <primary-key name="PURCHASE..PRIMARY_KEY">
+            <column name="ID"/>
+          </primary-key>
+          <index name="IDX_PURCHASE_DATE_PURCHASED" unique="false">
+            <column name="DATE_PURCHASED"/>
+          </index>
+          <foreign-key primary-schema="STOREFRONT" primary-table="CUSTOMER" foreign-schema="STOREFRONT" foreign-table="PURCHASE" update-action="cascade" delete-action="no_action">
+            <reference primary-column="ID" foreign-column="CUSTOMER_ID"/>
+          </foreign-key>
+        </table>
+        <table name="PURCHASE_SELECTION" type="TABLE">
+          <column name="DATE_ADDED">
+            <type code="93" name="timestamp" size="12" precision="16" scale="6"/>
+          </column>
+          <column name="DATE_MODIFIED">
+            <type code="93" name="timestamp" size="12" precision="16" scale="6"/>
+          </column>
+          <column name="QUANTITY">
+            <type code="4" name="integer" size="4" precision="9" scale="0"/>
+          </column>
+          <column name="REGION">
+            <type code="12" name="varchar" size="255" precision="255" scale="0"/>
+          </column>
+          <column name="UNIT_PRICE">
+            <type code="4" name="integer" size="4" precision="8" scale="2"/>
+          </column>
+          <column name="PURCHASE_ID">
+            <type code="-5" name="bigint" size="8" precision="19" scale="0"/>
+          </column>
+          <column name="PRODUCT_ID">
+            <type code="-5" name="bigint" size="8" precision="19" scale="0"/>
+          </column>
+          <primary-key name="PURCHASE_SELECTION..PRIMARY_KEY">
+            <column name="PURCHASE_ID"/>
+            <column name="PRODUCT_ID"/>
+          </primary-key>
+          <index name="IDX_PRODUCT_SELECTION_DATE_MODIFIED" unique="false">
+            <column name="DATE_MODIFIED"/>
+          </index>
+          <foreign-key primary-schema="STOREFRONT" primary-table="PRODUCT" foreign-schema="STOREFRONT" foreign-table="PURCHASE_SELECTION" update-action="cascade" delete-action="no_action">
+            <reference primary-column="ID" foreign-column="PRODUCT_ID"/>
+          </foreign-key>
+          <foreign-key primary-schema="STOREFRONT" primary-table="PURCHASE" foreign-schema="STOREFRONT" foreign-table="PURCHASE_SELECTION" update-action="cascade" delete-action="no_action">
+            <reference primary-column="ID" foreign-column="PURCHASE_ID"/>
+          </foreign-key>
+        </table>
+      </schema>
+    </catalog>
+  </database>
+  <row-set type="table" name="storefront.app_instance" row-count="1" schema="STOREFRONT" table="APP_INSTANCE">
+    <column name="UUID" value-type="string"/>
+    <column name="CPU_UTILIZATION" value-type="string"/>
+    <column name="CURRENCY" value-type="string"/>
+    <column name="DATE_STARTED" value-type="string"/>
+    <column name="FIRST_HEARTBEAT" value-type="string"/>
+    <column name="LAST_API_ACTIVITY" value-type="string"/>
+    <column name="LAST_HEARTBEAT" value-type="string"/>
+    <column name="NODE_ID" value-type="string"/>
+    <column name="REGION" value-type="string"/>
+    <column name="STOP_USERS_WHEN_IDLE" value-type="string"/>
+    <column name="URL" value-type="string"/>
+    <chunk name="storefront.app_instance.csv" row-count="1"/>
+  </row-set>
+  <row-set type="table" name="storefront.cart_selection" row-count="0" schema="STOREFRONT" table="CART_SELECTION">
+    <column name="DATE_ADDED" value-type="string"/>
+    <column name="DATE_MODIFIED" value-type="string"/>
+    <column name="QUANTITY" value-type="string"/>
+    <column name="REGION" value-type="string"/>
+    <column name="UNIT_PRICE" value-type="string"/>
+    <column name="CUSTOMER_ID" value-type="string"/>
+    <column name="PRODUCT_ID" value-type="string"/>
+  </row-set>
+  <row-set type="table" name="storefront.customer" row-count="100" schema="STOREFRONT" table="CUSTOMER">
+    <column name="ID" value-type="string"/>
+    <column name="DATE_ADDED" value-type="string"/>
+    <column name="DATE_LAST_ACTIVE" value-type="string"/>
+    <column name="EMAIL_ADDRESS" value-type="string"/>
+    <column name="REGION" value-type="string"/>
+    <column name="WORKLOAD" value-type="string"/>
+    <chunk name="storefront.customer.csv" row-count="100"/>
+  </row-set>
+  <row-set type="table" name="storefront.product" row-count="5000" schema="STOREFRONT" table="PRODUCT">
+    <column name="ID" value-type="string"/>
+    <column name="DATE_ADDED" value-type="string"/>
+    <column name="DATE_MODIFIED" value-type="string"/>
+    <column name="DESCRIPTION" value-type="string"/>
+    <column name="IMAGE_URL" value-type="string"/>
+    <column name="NAME" value-type="string"/>
+    <column name="PURCHASE_COUNT" value-type="string"/>
+    <column name="RATING" value-type="string"/>
+    <column name="REVIEW_COUNT" value-type="string"/>
+    <column name="UNIT_PRICE" value-type="string"/>
+    <chunk name="storefront.product.csv" row-count="5000"/>
+  </row-set>
+  <row-set type="table" name="storefront.product_category" row-count="7427" schema="STOREFRONT" table="PRODUCT_CATEGORY">
+    <column name="PRODUCT_ID" value-type="string"/>
+    <column name="CATEGORY" value-type="string"/>
+    <chunk name="storefront.product_category.csv" row-count="7427"/>
+  </row-set>
+  <row-set type="table" name="storefront.product_review" row-count="0" schema="STOREFRONT" table="PRODUCT_REVIEW">
+    <column name="ID" value-type="string"/>
+    <column name="COMMENTS" value-type="string"/>
+    <column name="DATE_ADDED" value-type="string"/>
+    <column name="RATING" value-type="string"/>
+    <column name="REGION" value-type="string"/>
+    <column name="TITLE" value-type="string"/>
+    <column name="CUSTOMER_ID" value-type="string"/>
+    <column name="PRODUCT_ID" value-type="string"/>
+  </row-set>
+  <row-set type="table" name="storefront.purchase" row-count="0" schema="STOREFRONT" table="PURCHASE">
+    <column name="ID" value-type="string"/>
+    <column name="DATE_PURCHASED" value-type="string"/>
+    <column name="REGION" value-type="string"/>
+    <column name="CUSTOMER_ID" value-type="string"/>
+  </row-set>
+  <row-set type="table" name="storefront.purchase_selection" row-count="0" schema="STOREFRONT" table="PURCHASE_SELECTION">
+    <column name="DATE_ADDED" value-type="string"/>
+    <column name="DATE_MODIFIED" value-type="string"/>
+    <column name="QUANTITY" value-type="string"/>
+    <column name="REGION" value-type="string"/>
+    <column name="UNIT_PRICE" value-type="string"/>
+    <column name="PURCHASE_ID" value-type="string"/>
+    <column name="PRODUCT_ID" value-type="string"/>
+  </row-set>
+</backup>
