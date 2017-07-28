@@ -24,7 +24,6 @@ RUN yum -y install --setopt=tsflags=nodocs java net-tools git epel-release pytho
     && yum clean all
 
 RUN /usr/bin/pip install -r /opt/nuoca/requirements.txt
-#RUN cd /opt/nuomonitor && python /opt/nuomonitor/setup.py install
 
 ADD scripts /scripts
 ADD dbSchema /dbSchema
