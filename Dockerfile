@@ -19,7 +19,7 @@ RUN yum -y install --setopt=tsflags=nodocs java net-tools git epel-release pytho
     && rm -rf /opt/nuodb/{samples,doc} \
     && rm -rf /tmp/nuodb.tgz \
     && git clone https://github.com/thebithead/nuoca.git /opt/nuoca \
-    && git clone https://github.com/nuodb/nuodb-monitoring.git /opt/nuomonitor \
+    && git clone https://github.com/thebithead/nuomonitor.git /opt/nuomonitor \
     && yum autoremove git -y \
     && yum clean all
 

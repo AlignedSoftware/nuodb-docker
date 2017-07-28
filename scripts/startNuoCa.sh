@@ -3,7 +3,7 @@
 export NUODB_HOME=/opt/nuodb/
 
 #start nuomonitor
-nuomonitor -s ${PEER_ADDRESS} -s 8888 -u ${DB_USER} -p ${DB_PASSWORD} -m Commits -i 10
+nuomonitor -s ${PEER_ADDRESS} -P 8888 -u ${DB_USER} -p ${DB_PASSWORD} -m Commits -i 10
 
 #update yaml file
 sed -i "/broker: 172.19.0.16/c\    broker: ${PEER_ADDRESS}" /opt/nuoca/tests/dev/configs/nuomonitor_to_restclient.yml
