@@ -12,5 +12,4 @@ sed -i "/url/c\    url: ${ARG_apphost}" /opt/nuoca/tests/dev/configs/nuomonitor_
 python /opt/nuoca/src/nuoca.py \
         --config-file /opt/nuoca/tests/dev/configs/nuomonitor_to_restclient.yml \
         --plugin-dir /opt/nuoca/tests/dev/plugins \
-        --collection-interval=10 \
-        --self-test &
+        --collection-interval=10  &
