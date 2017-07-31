@@ -103,10 +103,8 @@ fi
 if [ "${NODE_TYPE}" == "TE" ] && ${POPUlATE_NUODB}; then
     #check if there's a db already
     eval_db="$(/opt/nuodb/bin/nuodbmgr --broker localhost --password $DOMAIN_PASSWORD --command "show domain databases" | grep ${DB_NAME})"
-    if ! $eval_db; then
-       #create schema
-       echo "place holder"
-       #use nuodb-migrator to populate db
+    if [ -z "$eval_db" ]; then
+       /bin/bash /scripts/createDb.sh
     fi
 fi
 
