@@ -87,7 +87,7 @@ def performBuild(image, args, imageName=null, dockerfile="Dockerfile") {
 }
 
 // On a node which has docker
-node('docker && rhel') {
+node('docker && aml') {
 
     stage('checkout') {
 	checkout scm
@@ -102,7 +102,7 @@ node('docker && rhel') {
     withCredentials([usernamePassword(credentialsId: 'redhat.subscription', passwordVariable: 'RHPASS', usernameVariable: 'RHUSER')]) {
 	performBuild("nuodb", BUILDARGS)
 	performBuild("nuodb-ce", BUILDARGS, "nuodb/nuodb-ce")
-	performBuild("nuodb-ce", BUILDARGS, "${env.REDHAT_KEY}/nuodb-ce", "Dockerfile.RHEL")
+//	performBuild("nuodb-ce", BUILDARGS, "${env.REDHAT_KEY}/nuodb-ce", "Dockerfile.RHEL")
     }
 
     //////////////////////////////////////////////////////////////////////
