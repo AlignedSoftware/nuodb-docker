@@ -105,7 +105,8 @@ if [ "${NODE_TYPE}" == "TE" ] && ${POPULATE_NUODB}; then
     sleep 30
     eval_db="$(/opt/nuodb/bin/nuodbmgr --broker localhost --password $DOMAIN_PASSWORD --command "show domain databases" | grep ${DB_NAME})"
     if [ -z "$eval_db" ]; then
-       /bin/bash /scripts/createDb.sh
+       #/bin/bash /scripts/createDb.sh
+       echo "do nothing"
     fi
 fi
 
