@@ -73,7 +73,7 @@ def standardPush(label, imageName, tag_prefix, repo, credentials, tags) {
 
 /** Perform the actual build, with full build arguments
  */
-def performBuild(image, args, imageName=null) {
+def performBuild(image, args, imageName=null, dockerfile="Dockerfile") {
 	stage("Build ${image}") {
 	    def buildargs = args.collect { k, v -> k + "=" + v }.join(" --build-arg ") 
 
@@ -81,13 +81,13 @@ def performBuild(image, args, imageName=null) {
 		imageName=image
 	    }
 
-	    sh "docker build -t ${imageName} --build-arg RHUSER=${RHUSER} --build-arg RHPASS=${RHPASS} --build-arg VERSION=${image} --build-arg ${buildargs} ."
+	    sh "docker build -t ${imageName} -f ${dockerfile}  --build-arg RHUSER=${RHUSER} --build-arg RHPASS=${RHPASS} --build-arg VERSION=${image} --build-arg ${buildargs} ."
 
 	}
 }
 
 // On a node which has docker
-node('docker') {
+node('docker && aml') {
 
     stage('checkout') {
 	checkout scm
@@ -102,7 +102,7 @@ node('docker') {
     withCredentials([usernamePassword(credentialsId: 'redhat.subscription', passwordVariable: 'RHPASS', usernameVariable: 'RHUSER')]) {
 	performBuild("nuodb", BUILDARGS)
 	performBuild("nuodb-ce", BUILDARGS, "nuodb/nuodb-ce")
-	performBuild("nuodb-ce", BUILDARGS, "${env.REDHAT_KEY}/nuodb-ce")
+//	performBuild("nuodb-ce", BUILDARGS, "${env.REDHAT_KEY}/nuodb-ce", "Dockerfile.RHEL")
     }
 
     //////////////////////////////////////////////////////////////////////
