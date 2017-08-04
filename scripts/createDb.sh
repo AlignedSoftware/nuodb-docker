@@ -3,7 +3,7 @@ set -x
 
 #create database
 /opt/nuodb/bin/nuodbmgr --broker $PEER_ADDRESS --password $DOMAIN_PASSWORD \
-        --command "create database dbname ${DB_NAME} template 'Multi Host' dbaUser ${DB_USER} dbaPassword ${DB_PASSWORD} HOST_LIMIT true SM_MAX 1"
+        --command "create database dbname ${DB_NAME} template 'Multi Host' dbaUser ${DB_USER} dbaPassword ${DB_PASSWORD} tagConstraints:SMs 'SM_OK ex:' tagConstraints:TEs 'TE_OK ex:'"
 
 #create database schema
 /opt/nuodb/bin/nuosql $DB_NAME@$PEER_ADDRESS --user $DB_USER --password $DB_PASSWORD --schema STOREFRONT --file /dbSchema/schema.sql
