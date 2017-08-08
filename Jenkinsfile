@@ -122,5 +122,5 @@ node('docker && aml') {
     //////////////////////////////////////////////////////////////////////
 
     standardPush("docker hub", "nuodb/nuodb-ce", tag_prefix, "", dockerhubPushCredentials, tagSet)
-    standardPush("RedHat", "${env.REDHAT_KEY}/nuodb-ce", tag_prefix, redhatRepo, redhatPushCredentials, tagSet)
+//    standardPush("RedHat", "${env.REDHAT_KEY}/nuodb-ce", tag_prefix, redhatRepo, redhatPushCredentials, tagSet)
 }
