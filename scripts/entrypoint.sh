@@ -7,9 +7,9 @@ if [ "${ENV_TYPE}" == "OPENSHIFT" ]; then
 elif [ "${ENV_TYPE}" == "AWSECS" ]; then
     IPADDRESS="$(ifconfig eth0 | grep broadcast | awk '{print $2}')"
     export ALT_ADDRESS=$IPADDRESS
-
 elif [ "${ENV_TYPE}" == "AWSEC2" ]; then
-    echo "placeholder for AWSEC2"
+    IPADDRESS="$(curl http://169.254.169.254/latest/meta-data/local-ipv4/)"
+    export ALT_ADDRESS=$IPADDRESS
 elif [ "${ENV_TYPE}" == "AZURE" ]; then
     echo "placehodler for AZURE"
 elif [ "${ENV_TYPE}" == "GOOGLE" ]; then
