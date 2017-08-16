@@ -8,6 +8,12 @@ python /opt/nuomonitor/nuomonitor.py -b ${PEER_ADDRESS} -u domain -p ${DOMAIN_PA
 #update yaml file
 sed -i "/broker: 172.19.0.16/c\    broker: ${PEER_ADDRESS}" /opt/nuoca/tests/dev/configs/nuomonitor_to_restclient.yml
 sed -i "/url/c\    url: ${ARG_apphost}" /opt/nuoca/tests/dev/configs/nuomonitor_to_restclient.yml
+python prepNuoCa.py \
+        --peer-addr=${PEER_ADDRESS} \
+        --app-host=${ARG_apphost} \
+        --elastic-host=${ELASTIC_HOST} \
+        --elastic-port=${ELASTIC_PORT} \
+        --elastic-index=${ELASTIC_INDEX}
 
 python /opt/nuoca/src/nuoca.py \
         --config-file /opt/nuoca/tests/dev/configs/nuomonitor_to_restclient.yml \
