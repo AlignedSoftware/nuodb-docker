@@ -100,7 +100,7 @@ fi
 /opt/nuodb/etc/nuorestsvc start
 
 #create and populate database if doesn't exist
-if [ "${NODE_TYPE}" == "TE" ] && ${POPULATE_NUODB}; then
+if [ "${NODE_TYPE}" == "SM" ] && ${POPULATE_NUODB}; then
     #check if there's a db already
     sleep 30
     eval_db="$(/opt/nuodb/bin/nuodbmgr --broker localhost --password $DOMAIN_PASSWORD --command "show domain databases" | grep ${DB_NAME})"
