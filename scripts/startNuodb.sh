@@ -96,8 +96,24 @@ fi
 /bin/bash /scripts/disable_thp.sh
 
 
-#start api service
-/opt/nuodb/etc/nuorestsvc start
+#start api service on broker
+if [ "${NODE_TYPE}" = "BROKER" ]; then
+    status=""
+    count=1
+    while [ "$status" == "" ]; do
+        echo "wait 5 seconds for local broker"
+        sleep 5
+        status="$( /opt/nuodb/bin/nuodbmgr --broker localhost --password $DOMAIN_PASSWORD --command 'show domain summary' | grep broker )"
+        ((count++))
+        echo "loop count: " $count
+        if [ "$count" == 10 ]; then
+            echo "timed out waiting for local broker to respond. Exiting"
+            exit 1
+        fi
+    done
+
+    /opt/nuodb/etc/nuorestsvc start
+fi
 
 #create and populate database if doesn't exist
 if [ "${NODE_TYPE}" == "SM" ] && ${POPULATE_NUODB}; then
