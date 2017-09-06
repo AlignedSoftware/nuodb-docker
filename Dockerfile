@@ -4,6 +4,7 @@ ARG RELEASE_PACKAGE=36
 ARG BUILD=4
 ARG RELEASE_BUILD=3.0.0
 ARG VERSION=nuodb
+ARG PACKAGE_DIR=Linux-CE
 
 LABEL "name"="$VERSION" \
       "vendor"="NuoDB LTD" \
@@ -12,7 +13,7 @@ LABEL "name"="$VERSION" \
 
 RUN yum -y install epel-release
 RUN yum -y install --setopt=tsflags=nodocs java net-tools git epel-release python-pip \
-    && curl -SL http://bamboo.bo2.nuodb.com/bamboo/artifact/RELEASE-PACKAGE$RELEASE_PACKAGE/shared/build-$BUILD/Linux-.tar.gz/$VERSION-$RELEASE_BUILD.$BUILD.linux.x86_64.tar.gz -o /tmp/nuodb.tgz \
+    && curl -SL http://bamboo.bo2.nuodb.com/bamboo/artifact/RELEASE-PACKAGE$RELEASE_PACKAGE/shared/build-$BUILD/$PACKAGE_DIR/$VERSION-$RELEASE_BUILD.$BUILD.linux.x86_64.tar.gz -o /tmp/nuodb.tgz \
     && mkdir -p /opt/nuodb \
     && tar -xvf /tmp/nuodb.tgz -C /opt/nuodb --strip-components 1 \
 #remove extra directories
