@@ -1,16 +1,13 @@
 //def tag_prefix=env.BRANCH_NAME.replaceAll(/[^a-zA-Z0-9_]/,"_")
 // This should really come from branch name
 
-def tag_prefix=""
+env.awsPushCredentials="build-jenkins-oa"
+env.region="us-east-1"
 
-def awsPushCredentials="build-jenkins-oa"
-def nuodbRepo=env.REPOSITORY
-def region="us-east-1"
+env.dockerhubPushCredentials="docker.io-nuodb-push"
 
-def dockerhubPushCredentials="docker.io-nuodb-push"
-
-def redhatPushCredentials="redhat.nuodb.push"
-def redhatRepo="https://registry.rhc4tp.openshift.com"
+env.redhatPushCredentials="redhat.nuodb.push"
+env.redhatRepo="https://registry.rhc4tp.openshift.com"
 
 def suffix=env.SUFFIX
 
@@ -45,17 +42,15 @@ def buildTags(array) {
  * all the usuall tags.
  */
 
-def standardPush(label, imageName, tag_prefix, repo, credentials, tags) {
+def standardPush(label, imageName, repo, credentials, tags) {
 
     def image = docker.image(imageName)
 
     docker.withRegistry(repo, credentials) {
-	stage("Push ${imageName} to ${label}") {
-	    tags.each {
-		echo "docker push ${imageName} ${repo}/${imageName}:${tag_prefix}${it}${suffix}"
-		image.push("${tag_prefix}${it}${suffix}")
-	    }
-	}
+            tags.each {
+                echo "docker push ${imageName} ${repo}/${imageName}:${it}${suffix}"
+                image.push("${it}${suffix}")
+            }
     }
 }
 
@@ -110,34 +105,32 @@ def dobuild(filename) {
 
 	}
 
+    stage("Push ${props.VERSION} ${props.RELEASE_BUILD}") {
 
-    if(true) {
-	//	performBuild(props.VERSION, props)
-    }
-    else {
-	withCredentials([usernamePassword(credentialsId: 'redhat.subscription', passwordVariable: 'RHPASS', usernameVariable: 'RHUSER')]) {
-	    performBuild("nuodb-ce", props, "nuodb/nuodb-ce")
-		//	performBuild("nuodb-ce", props, "${env.REDHAT_KEY}/nuodb-ce", "Dockerfile.RHEL")
-		}
-    }
+    def tagSet = buildTags(VersionArray)
+    def image = docker.image(imageName)
 
     //////////////////////////////////////////////////////////////////////
     //
     //      The NuoDB (full) docker image can only go to AWS ECR
     //
     //////////////////////////////////////////////////////////////////////
+        if(props.VERSION.equals("nuodb")) {
+	    sh "docker tag ${imageName} nuodb"
+	    standardPush("ECR", "nuodb", env.REPOSITORY, "ecr:${env.region}:${env.awsPushCredentials}", tagSet)
+	}
+        else if(props.VERSION.equals("nuodb-ce")) {
+	    sh "docker tag ${imageName} nuodb/nuodb-ce"
+	    standardPush("docker hub", "nuodb/nuodb-ce", "", env.dockerhubPushCredentials, tagSet)
+	}
 
-    def tagSet = buildTags(VersionArray)
-	//    standardPush("ECR", "nuodb", tag_prefix, nuodbRepo, "ecr:${region}:${awsPushCredentials}", tagSet)
+	    /*
+	withCredentials([usernamePassword(credentialsId: 'redhat.subscription', passwordVariable: 'RHPASS', usernameVariable: 'RHUSER')]) {
+	   performBuild("nuodb-ce", props, "${env.REDHAT_KEY}/nuodb-ce", "Dockerfile.RHEL")
+		}
+	    */
 
-    //////////////////////////////////////////////////////////////////////
-    //
-    //      The NuoDB-CE image can be pushed to docker hub and to
-    //      RedHat repository
-    //
-    //////////////////////////////////////////////////////////////////////
+    }
 
-	//    standardPush("docker hub", "nuodb/nuodb-ce", tag_prefix, "", dockerhubPushCredentials, tagSet)
-//    standardPush("RedHat", "${env.REDHAT_KEY}/nuodb-ce", tag_prefix, redhatRepo, redhatPushCredentials, tagSet)
 }
 }
