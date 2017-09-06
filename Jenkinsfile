@@ -15,6 +15,7 @@ def redhatRepo="https://registry.rhc4tp.openshift.com"
 def release_build=env.RELEASE_BUILD
 def release_package=env.RELEASE_PACKAGE
 def build=env.RELEASE_BUILD_NUMBER
+def suffix=env.SUFFIX
 
     // A map of build arguments that will be passed to docker
 def BUILDARGS = [ "RELEASE_BUILD": release_build,
@@ -64,8 +65,8 @@ def standardPush(label, imageName, tag_prefix, repo, credentials, tags) {
     docker.withRegistry(repo, credentials) {
 	stage("Push ${imageName} to ${label}") {
 	    tags.each {
-		echo "docker push ${imageName} ${repo}/${imageName}:${tag_prefix}${it}"
-		image.push("${tag_prefix}${it}")
+		echo "docker push ${imageName} ${repo}/${imageName}:${tag_prefix}${it}${suffix}"
+		image.push("${tag_prefix}${it}${suffix}")
 	    }
 	}
     }
