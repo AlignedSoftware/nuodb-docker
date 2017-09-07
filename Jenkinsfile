@@ -1,32 +1,17 @@
 //def tag_prefix=env.BRANCH_NAME.replaceAll(/[^a-zA-Z0-9_]/,"_")
 // This should really come from branch name
 
-def tag_prefix=""
+env.awsPushCredentials="build-jenkins-oa"
+env.region="us-east-1"
 
-def awsPushCredentials="build-jenkins-oa"
-def nuodbRepo=env.REPOSITORY
-def region="us-east-1"
+env.dockerhubPushCredentials="docker.io-nuodb-push"
 
-def dockerhubPushCredentials="docker.io-nuodb-push"
+env.redhatPushCredentials="redhat.nuodb.push"
+env.redhatRepo="https://registry.rhc4tp.openshift.com"
 
-def redhatPushCredentials="redhat.nuodb.push"
-def redhatRepo="https://registry.rhc4tp.openshift.com"
+def suffix=env.SUFFIX
 
-def release_build=env.RELEASE_BUILD
-def release_package=env.RELEASE_PACKAGE
-def build=env.RELEASE_BUILD_NUMBER
-
-    // A map of build arguments that will be passed to docker
-def BUILDARGS = [ "RELEASE_BUILD": release_build,
-		  "RELEASE_PACKAGE": release_package,
-		  "BUILD": build,
-		  ]
-    /**  A list of version numbers used to build tags.  See #buildTags for details
-     */
-def VersionArray = [ release_build, release_package, build, env.BUILD_NUMBER]
 		 
-
-
 
     /** Build a list of tags from an array of version numbers.
      *
@@ -57,41 +42,49 @@ def buildTags(array) {
  * all the usuall tags.
  */
 
-def standardPush(label, imageName, tag_prefix, repo, credentials, tags) {
+def standardPush(label, imageName, repo, credentials, tags) {
 
     def image = docker.image(imageName)
 
     docker.withRegistry(repo, credentials) {
-	stage("Push ${imageName} to ${label}") {
-	    tags.each {
-		echo "docker push ${imageName} ${repo}/${imageName}:${tag_prefix}${it}"
-		image.push("${tag_prefix}${it}")
-	    }
-	}
+            tags.each {
+                echo "docker push ${imageName} ${repo}/${imageName}:${it}${suffix}"
+                image.push("${it}${suffix}")
+            }
     }
-}
-
-/** Perform the actual build, with full build arguments
- */
-def performBuild(image, args, imageName=null, dockerfile="Dockerfile") {
-	stage("Build ${image}") {
-	    def buildargs = args.collect { k, v -> k + "=" + v }.join(" --build-arg ") 
-
-            if(!imageName) {
-		imageName=image
-	    }
-
-	    sh "docker build -t ${imageName} -f ${dockerfile}  --build-arg RHUSER=${RHUSER} --build-arg RHPASS=${RHPASS} --build-arg VERSION=${image} --build-arg ${buildargs} ."
-
-	}
 }
 
 // On a node which has docker
-node('docker && aml') {
+node() {
 
-    stage('checkout') {
+    stage('Read Configs') {
 	checkout scm
     }
+
+    build_configs = findFiles(glob: 'build-params/*.properties')
+    echo "Build configs are: ${build_configs}"
+
+}
+
+for(int i=0; i<build_configs.size(); i++) {
+    echo "Calling dobuild on ${build_configs[i]}"
+    dobuild(build_configs[i])
+}
+
+def dobuild(filename) {
+
+	echo "Building from ${filename}"
+
+	    // TODO:  if we can read and pass in the props, we can abstract the node type
+	node("docker && aml") {
+	checkout scm
+
+        def default_properties = [DOCKERFILE: 'Dockerfile', NODE_TYPE:'aml']
+	def props = readProperties defaults: default_properties, file: filename
+
+    /**  A list of version numbers used to build tags.  See #buildTags for details
+     */
+	def VersionArray = [ props.RELEASE_BUILD, props.RELEASE_PACKAGE, props.BUILD, env.BUILD_NUMBER]
 
     //////////////////////////////////////////////////////////////////////
     //
@@ -99,28 +92,45 @@ node('docker && aml') {
     //
     //////////////////////////////////////////////////////////////////////
 
-    withCredentials([usernamePassword(credentialsId: 'redhat.subscription', passwordVariable: 'RHPASS', usernameVariable: 'RHUSER')]) {
-	performBuild("nuodb", BUILDARGS)
-	performBuild("nuodb-ce", BUILDARGS, "nuodb/nuodb-ce")
-//	performBuild("nuodb-ce", BUILDARGS, "${env.REDHAT_KEY}/nuodb-ce", "Dockerfile.RHEL")
-    }
+	echo "Build stage"
+
+	stage("Build ${props.VERSION} ${props.RELEASE_BUILD}") {
+		echo "Building command line"
+	    def buildargs = props.collect { k, v -> k + "=" + v }.join(" --build-arg ") 
+		echo "Command line is: ${buildargs}"
+
+	    imageName="${props.VERSION}-${props.RELEASE_BUILD}-${BUILD_NUMBER}"
+
+	    sh "docker build -t ${imageName} -f ${props.DOCKERFILE} --build-arg ${buildargs} ."
+
+	}
+
+    stage("Push ${props.VERSION} ${props.RELEASE_BUILD}") {
+
+    def tagSet = buildTags(VersionArray)
+    def image = docker.image(imageName)
 
     //////////////////////////////////////////////////////////////////////
     //
     //      The NuoDB (full) docker image can only go to AWS ECR
     //
     //////////////////////////////////////////////////////////////////////
+        if(props.VERSION.equals("nuodb")) {
+	    sh "docker tag ${imageName} nuodb"
+	    standardPush("ECR", "nuodb", env.REPOSITORY, "ecr:${env.region}:${env.awsPushCredentials}", tagSet)
+	}
+        else if(props.VERSION.equals("nuodb-ce")) {
+	    sh "docker tag ${imageName} nuodb/nuodb-ce"
+	    standardPush("docker hub", "nuodb/nuodb-ce", "", env.dockerhubPushCredentials, tagSet)
+	}
 
-    def tagSet = buildTags(VersionArray)
-    standardPush("ECR", "nuodb", tag_prefix, nuodbRepo, "ecr:${region}:${awsPushCredentials}", tagSet)
+	    /*
+	withCredentials([usernamePassword(credentialsId: 'redhat.subscription', passwordVariable: 'RHPASS', usernameVariable: 'RHUSER')]) {
+	   performBuild("nuodb-ce", props, "${env.REDHAT_KEY}/nuodb-ce", "Dockerfile.RHEL")
+		}
+	    */
 
-    //////////////////////////////////////////////////////////////////////
-    //
-    //      The NuoDB-CE image can be pushed to docker hub and to
-    //      RedHat repository
-    //
-    //////////////////////////////////////////////////////////////////////
+    }
 
-    standardPush("docker hub", "nuodb/nuodb-ce", tag_prefix, "", dockerhubPushCredentials, tagSet)
-//    standardPush("RedHat", "${env.REDHAT_KEY}/nuodb-ce", tag_prefix, redhatRepo, redhatPushCredentials, tagSet)
+}
 }
