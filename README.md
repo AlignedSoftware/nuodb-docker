@@ -1,7 +1,6 @@
-**DESCRIPTION:**
+## DESCRIPTION
 
-
-**DOCKER BUILD:**
+## DOCKER BUILD
 
  `RELEASE_PACKAGE=##`  - Bamboo release package number
  
@@ -33,7 +32,7 @@ docker build \
     --build-arg RHUSER=redhatAccount@example.com \
     --build-arg RHPASS=RedHatPassword
 ```
-**DOCKER RUN:**
+##DOCKER RUN
 
 General environment variables:
 
@@ -66,4 +65,47 @@ oc new-app docker.io/nuodbopenshift/nuodb-ce:latest \
     -e "USERNAME=developer"  \
     -e "PASSWORD=developer" 
 ```
+
+## Adding new docker builds
+
+The build process uses the properties files in build-params directory.
+Each properties file generate a docker image that is built and pushed
+to the appropriate repository ([docker
+hub](https://hub.docker.com/r/nuodb/nuodb-ce) for NuoDB CE, internal
+proprietary location for NuoDB full)
+
+The properties file should look something like this:
+
+```
+RELEASE_BUILD=3.0.0
+BUILD=4
+PACKAGE_DIR=Linux-.tar.gz
+RELEASE_PACKAGE=36
+VERSION=nuodb
+```
+
+All of the above properties are used in constructing the path to
+locate the appropriate artifact in the NuoDB build system.
+Additionally, the `VERSION` property is used to distinguish between
+NuoDB Full and NuoDB CE.
+
+To add a new build, simply create another properties file with the
+appropriate values.
+
+## Docker tags
+
+Each time an image is built, it is pushed to the apporpriate
+repository with multiple tags.  This makes it possible to specify the
+desired image to any level.
+
+For example, when a NuoDB CE image is built of version 3.0.0, package 36, build 4, it is tagged as:
+
+* nuodb/nuodb-ce:3.0.0
+* nuodb/nuodb-ce:3.0.0-36
+* nuodb/nuodb-ce:3.0.0-36-4
+* nuodb/nuodb-ce:3.0.0-36-4-<build number> where the build number is the unique build on the NuoDB build system.
+
+Note that the tag 'latest' is never used -- you must at least specify
+the first component (version number) of the tag.
+
 
