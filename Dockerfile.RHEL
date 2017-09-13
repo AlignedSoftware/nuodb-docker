@@ -30,8 +30,12 @@ RUN curl -SL http://bamboo.bo2.nuodb.com/bamboo/artifact/RELEASE-PACKAGE$RELEASE
     && tar xvf /tmp/nuodb.tgz -C /opt/nuodb --strip-components 1 \
     && rm -rf /tmp/nuodb.tgz
 
+RUN useradd -l -u 1000 -r -g 0 -d /opt/nuodb -s /sbin/nologin -c "nuodb user" nuodb \
 #set ownership of nuodb home
-RUN chown -R root:root /opt/nuodb
+    && chown -R nuodb:0 /opt/{nuodb,nuoca} /scripts \
+    && chmod -R g=u /opt/{nuodb,nuoca} /scripts
+
+USER 1000
 
 ADD scripts /scripts
 COPY help.1 /
