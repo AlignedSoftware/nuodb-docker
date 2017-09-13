@@ -62,21 +62,33 @@ node() {
     }
 
     build_configs = findFiles(glob: 'build-params/*.properties')
+
+    buildinfo = []
+    def default_properties = [DOCKERFILE: 'Dockerfile', NODE_TYPE:'aml']
+
+    // You have to iterate this way in Jenkins to avoid a marshalling error
+    for(int i=0; i<build_configs.size(); i++) {
+    filename = build_configs[i]
+	props = readProperties defaults: default_properties, file: filename
+	buildinfo.add([ props.NODE_TYPE , filename ])
+	props = null
+    }
+
     echo "Build configs are: ${build_configs}"
-
+    echo "Build info are: ${buildinfo}"
 }
 
-for(int i=0; i<build_configs.size(); i++) {
-    echo "Calling dobuild on ${build_configs[i]}"
-    dobuild(build_configs[i])
+for(int i=0; i<buildinfo.size(); i++) {
+    echo "Calling dobuild on ${buildinfo[i]}"
+    dobuild(buildinfo[i][0], buildinfo[i][1])
 }
 
-def dobuild(filename) {
+def dobuild(label, filename) {
 
-	echo "Building from ${filename}"
+	echo "Building from ${filename} on ${label}"
 
 	    // TODO:  if we can read and pass in the props, we can abstract the node type
-	node("docker && aml") {
+	node(label) {
 	checkout scm
 
         def default_properties = [DOCKERFILE: 'Dockerfile', NODE_TYPE:'aml']
@@ -94,18 +106,20 @@ def dobuild(filename) {
 
 	echo "Build stage"
 
-	stage("Build ${props.VERSION} ${props.RELEASE_BUILD}") {
+	imageName=(filename.toString() =~ /\w+\/(.*)\.properties/)[0][1]
+
+	stage("Build ${imageName}") {
 		echo "Building command line"
-	    def buildargs = props.collect { k, v -> k + "=" + v }.join(" --build-arg ") 
+	    def buildargs = props.collect { k, v -> "'${k}=${v}'" }.join(" --build-arg ") 
 		echo "Command line is: ${buildargs}"
 
-	    imageName="${props.VERSION}-${props.RELEASE_BUILD}-${BUILD_NUMBER}"
+//	    imageName="${props.VERSION}-${props.RELEASE_BUILD}-${BUILD_NUMBER}"
 
-	    sh "docker build -t ${imageName} -f ${props.DOCKERFILE} --build-arg ${buildargs} ."
+	    sh "docker build -t ${imageName} -f ${props.DOCKERFILE} --build-arg ${buildargs}  . "
 
 	}
 
-    stage("Push ${props.VERSION} ${props.RELEASE_BUILD}") {
+    stage("Push ${imageName}") {
 
     def tagSet = buildTags(VersionArray)
     def image = docker.image(imageName)
