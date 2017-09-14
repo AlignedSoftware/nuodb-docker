@@ -5,8 +5,7 @@ ARG RELEASE_PACKAGE=35
 ARG BUILD=8
 ARG RELEASE_BUILD=2.6.1
 ARG VERSION=nuodb-ce
-ARG RHUSER
-ARG RHPASS
+ARG PACKAGE_DIR=Linux-.tar.gz
 
 LABEL "name"="$VERSION" \
       "vendor"="NuoDB LTD" \
@@ -25,7 +24,7 @@ RUN tar xvf /tmp/oc-3.5.5.8-linux.tar.gz -C /bin && rm /tmp/oc-3.5.5.8-linux.tar
     && unzip /tmp/awscli-bundle.zip -d /tmp/ && /tmp/awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws \
     && rm -rf /tmp/awscli*
 
-RUN curl -SL http://bamboo.bo2.nuodb.com/bamboo/artifact/RELEASE-PACKAGE$RELEASE_PACKAGE/shared/build-$BUILD/Linux-.tar.gz/$VERSION-$RELEASE_BUILD.$BUILD.linux.x86_64.tar.gz -o /tmp/nuodb.tgz \
+RUN curl -SL http://bamboo.bo2.nuodb.com/bamboo/artifact/RELEASE-PACKAGE$RELEASE_PACKAGE/shared/build-$BUILD/$PACKAGE_DIR/$VERSION-$RELEASE_BUILD.$BUILD.linux.x86_64.tar.gz -o /tmp/nuodb.tgz \
     && mkdir -p /opt/nuodb \
     && tar xvf /tmp/nuodb.tgz -C /opt/nuodb --strip-components 1 \
     && rm -rf /tmp/nuodb.tgz
