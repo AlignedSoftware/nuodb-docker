@@ -42,7 +42,7 @@ def buildTags(array) {
  * all the usuall tags.
  */
 
-def standardPush(label, imageName, repo, credentials, tags) {
+def standardPush(imageName, repo, credentials, tags) {
 
     def image = docker.image(imageName)
 
@@ -83,12 +83,12 @@ for(int i=0; i<buildinfo.size(); i++) {
     dobuild(buildinfo[i][0], buildinfo[i][1])
 }
 
-def dobuild(label, filename) {
+def dobuild(nodelabel, filename) {
 
-	echo "Building from ${filename} on ${label}"
+	echo "Building from ${filename} on ${nodelabel}"
 
 	    // TODO:  if we can read and pass in the props, we can abstract the node type
-	node(label) {
+	node(nodelabel) {
 	checkout scm
 
         def default_properties = [DOCKERFILE: 'Dockerfile', NODE_TYPE:'docker', PUSH_TO:'normal']
@@ -98,6 +98,8 @@ def dobuild(label, filename) {
      */
 	def VersionArray = [ props.RELEASE_BUILD, props.RELEASE_PACKAGE, props.BUILD, env.BUILD_NUMBER]
 
+	def fullVersion=VersionArray.join(".")
+
     //////////////////////////////////////////////////////////////////////
     //
     // Build both the NuoDB (full) image and the NuoDB-CE image
@@ -106,20 +108,19 @@ def dobuild(label, filename) {
 
 	echo "Build stage"
 
-	imageName=(filename.toString() =~ /\w+\/(.*)\.properties/)[0][1]
+	def imageName=(filename.toString() =~ /\w+\/(.*)\.properties/)[0][1]
 
 	stage("Build ${imageName}") {
-		echo "Building command line"
 	    def buildargs = props.collect { k, v -> "'${k}=${v}'" }.join(" --build-arg ") 
-		echo "Command line is: ${buildargs}"
+//		echo "Command line is: ${buildargs}"
 
-//	    imageName="${props.VERSION}-${props.RELEASE_BUILD}-${BUILD_NUMBER}"
 
-	    sh "docker build -t ${imageName} -f ${props.DOCKERFILE} --build-arg ${buildargs}  . "
+	    sh "docker build -t ${imageName}:${fullVersion} -f ${props.DOCKERFILE} --build-arg ${buildargs}  . "
 
 	}
 
     stage("Push ${imageName}") {
+
 
     def tagSet = buildTags(VersionArray)
     def image = docker.image(imageName)
@@ -134,27 +135,20 @@ def dobuild(label, filename) {
  	      error( "We're not currently pushing full NuoDB built on redhat")
 	    }
 	    else {
-	      sh "docker tag ${imageName} nuodb"
-	      standardPush("ECR", "nuodb", env.REPOSITORY, "ecr:${env.region}:${env.awsPushCredentials}", tagSet)
+	      sh "docker tag ${imageName}:${fullVersion} nuodb:${fullVersion}"
+	      standardPush("nuodb:${fullVersion}", env.REPOSITORY, "ecr:${env.region}:${env.awsPushCredentials}", tagSet)
 	    }
 	}
         else if(props.VERSION.equals("nuodb-ce")) {
 	    if(props.PUSH_TO.equals("redhat")) {
- 	      sh "docker tag ${imageName} ${env.REDHAT_KEY}/nuodb-ce"
-	      standardPush("RedHat", "${env.REDHAT_KEY}/nuodb-ce", env.redhatRepo, env.redhatPushCredentials, tagSet)
+ 	      sh "docker tag ${imageName}:${fullVersion} ${env.REDHAT_KEY}/nuodb-ce:${fullVersion}"
+	      standardPush("${env.REDHAT_KEY}/nuodb-ce:${fullVersion}", env.redhatRepo, env.redhatPushCredentials, tagSet)
 	    }
 	    else {
- 	      sh "docker tag ${imageName} nuodb/nuodb-ce"
- 	      standardPush("docker hub", "nuodb/nuodb-ce", "", env.dockerhubPushCredentials, tagSet)
+ 	      sh "docker tag ${imageName}:${fullVersion} nuodb/nuodb-ce:${fullVersion}"
+ 	      standardPush("nuodb/nuodb-ce:${fullVersion}", "", env.dockerhubPushCredentials, tagSet)
 	    }
 	}
-
-	    /*
-	withCredentials([usernamePassword(credentialsId: 'redhat.subscription', passwordVariable: 'RHPASS', usernameVariable: 'RHUSER')]) {
-	   performBuild("nuodb-ce", props, "${env.REDHAT_KEY}/nuodb-ce", "Dockerfile.RHEL")
-		}
-	    */
-
     }
 
 }
