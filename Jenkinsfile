@@ -91,7 +91,7 @@ def dobuild(label, filename) {
 	node(label) {
 	checkout scm
 
-        def default_properties = [DOCKERFILE: 'Dockerfile', NODE_TYPE:'aml']
+        def default_properties = [DOCKERFILE: 'Dockerfile', NODE_TYPE:'aml', PUSH_TO:'normal']
 	def props = readProperties defaults: default_properties, file: filename
 
     /**  A list of version numbers used to build tags.  See #buildTags for details
@@ -130,12 +130,23 @@ def dobuild(label, filename) {
     //
     //////////////////////////////////////////////////////////////////////
         if(props.VERSION.equals("nuodb")) {
-	    sh "docker tag ${imageName} nuodb"
-	    standardPush("ECR", "nuodb", env.REPOSITORY, "ecr:${env.region}:${env.awsPushCredentials}", tagSet)
+	    if(props.PUSH_TO.equals("redhat")) {
+ 	      error( "We're not currently pushing full NuoDB built on redhat")
+	    }
+	    else {
+	      sh "docker tag ${imageName} nuodb"
+	      standardPush("ECR", "nuodb", env.REPOSITORY, "ecr:${env.region}:${env.awsPushCredentials}", tagSet)
+	    }
 	}
         else if(props.VERSION.equals("nuodb-ce")) {
-	    sh "docker tag ${imageName} nuodb/nuodb-ce"
-	    standardPush("docker hub", "nuodb/nuodb-ce", "", env.dockerhubPushCredentials, tagSet)
+	    if(props.PUSH_TO.equals("redhat")) {
+ 	      sh "docker tag ${imageName} ${env.REDHAT_KEY}/nuodb-ce"
+	      standardPush("RedHat", "${env.REDHAT_KEY}/nuodb-ce", env.redhatRepo, env.redhatPushCredentials, tagSet)
+	    }
+	    else {
+ 	      sh "docker tag ${imageName} nuodb/nuodb-ce"
+ 	      standardPush("docker hub", "nuodb/nuodb-ce", "", env.dockerhubPushCredentials, tagSet)
+	    }
 	}
 
 	    /*
