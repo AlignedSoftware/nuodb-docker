@@ -77,14 +77,38 @@ node() {
 	props = null
     }
 
-    echo "Build configs are: ${build_configs}"
+//    echo "Build configs are: ${build_configs}"
     echo "Build info are: ${buildinfo}"
 }
 
+builds=[:]
+
 for(int i=0; i<buildinfo.size(); i++) {
     echo "Calling dobuild on ${buildinfo[i]}"
-    dobuild(buildinfo[i][0], buildinfo[i][1])
+    filename = buildinfo[i][1]
+    label = buildinfo[i][0]
+    builds[filename]= makebuild(label, filename)
 }
+
+def makebuild(label, filename) {
+    return {
+        dobuild(label, filename)
+    }
+}
+
+echo "Parallel build: ${params.BUILD_IN_PARALLEL} ${params.BUILD_IN_PARALLEL.getClass()}"
+
+if(!params.BUILD_IN_PARALLEL) {
+   builds.each { k, v->
+     echo "Calling ${k}"
+     v()
+   }
+}
+else {
+// Actually perform the builds in parallel
+parallel builds
+}
+
 
 def dobuild(nodelabel, filename) {
 
