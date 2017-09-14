@@ -14,9 +14,6 @@ LABEL "name"="$VERSION" \
 
 ADD install /tmp
 
-RUN subscription-manager repos --disable="*" \
-    && subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-ose-3.0-rpms"
-
 RUN yum install net-tools java unzip -y
 
 RUN tar xvf /tmp/oc-3.5.5.8-linux.tar.gz -C /bin && rm /tmp/oc-3.5.5.8-linux.tar.gz \
