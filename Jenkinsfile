@@ -69,7 +69,7 @@ node() {
     // You have to iterate this way in Jenkins to avoid a marshalling error
     for(int i=0; i<build_configs.size(); i++) {
     filename = build_configs[i]
-	props = readProperties defaults: default_properties, file: filename
+	props = readProperties defaults: default_properties, file: filename.toString()
 	buildinfo.add([ props.NODE_TYPE , filename ])
 	props = null
     }
@@ -92,7 +92,7 @@ def dobuild(nodelabel, filename) {
 	checkout scm
 
         def default_properties = [DOCKERFILE: 'Dockerfile', NODE_TYPE:'docker', PUSH_TO:'normal']
-	def props = readProperties defaults: default_properties, file: filename
+	def props = readProperties defaults: default_properties, file: filename.toString()
 
     /**  A list of version numbers used to build tags.  See #buildTags for details
      */
