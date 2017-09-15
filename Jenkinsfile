@@ -46,12 +46,15 @@ def standardPush(imageName, repo, credentials, tags) {
 
     def image = docker.image(imageName)
 
-    docker.withRegistry(repo, credentials) {
+    // Sometimes a docker push fails due to a server side issue.  Work around docker's issue
+    retry (3) {
+      docker.withRegistry(repo, credentials) {
             tags.each {
                 echo "docker push ${imageName} ${repo}/${imageName}:${it}${suffix}"
                 image.push("${it}${suffix}")
             }
-    }
+      }
+  }
 }
 
 // On a node which has docker
